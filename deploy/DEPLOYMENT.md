@@ -141,10 +141,10 @@ The project must end up at `/var/www/readyio` with this layout:
 | Repo | Cloned into |
 | --- | --- |
 | `readyiolab/readyio-deploy` | `/var/www/readyio` (this `deploy/` folder + root README) |
-| `readyiolab/Blog-Backend-Software` | `/var/www/readyio/Backend` |
+| `readyiolab/blogpanel.ready.backend` | `/var/www/readyio/Backend` |
 | `readyiolab/readyiosite` | `/var/www/readyio/readyiosite` |
 | `readyiolab/readyiosite-blog` | `/var/www/readyio/readyiosite-blog` |
-| `readyiolab/Blog-Admin-Panel` | `/var/www/readyio/admin-panel` |
+| `readyiolab/blogpanel.readyio.com` | `/var/www/readyio/admin-panel` |
 
 The `.gitignore` files already exclude `node_modules`, builds, `Backend/.env` and every `.env.local`. On the server:
 
@@ -152,10 +152,10 @@ The `.gitignore` files already exclude `node_modules`, builds, `Backend/.env` an
 cd /var/www
 git clone git@github.com:readyiolab/readyio-deploy.git readyio
 cd readyio
-git clone git@github.com:readyiolab/Blog-Backend-Software.git Backend
+git clone git@github.com:readyiolab/blogpanel.ready.backend.git Backend
 git clone git@github.com:readyiolab/readyiosite.git readyiosite
 git clone git@github.com:readyiolab/readyiosite-blog.git readyiosite-blog
-git clone git@github.com:readyiolab/Blog-Admin-Panel.git admin-panel
+git clone git@github.com:readyiolab/blogpanel.readyio.com.git admin-panel
 ```
 
 `deploy.sh` runs `git pull --ff-only` in all five folders on every deploy.
