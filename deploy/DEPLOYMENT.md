@@ -291,6 +291,7 @@ As a sudo user:
 
 ```bash
 cd /var/www/readyio
+sudo cp deploy/nginx/snippets/cloudflare-realip.conf /etc/nginx/snippets/
 for site in readyio.com blog.readyio.com api.readyio.com blogpanel.readyio.com; do
   sudo cp deploy/nginx/$site.conf /etc/nginx/sites-available/$site.conf
   sudo ln -sf /etc/nginx/sites-available/$site.conf /etc/nginx/sites-enabled/$site.conf
@@ -300,6 +301,8 @@ sudo nginx -t && sudo systemctl reload nginx
 ```
 
 `blogpanel.readyio.com.conf` serves `/var/www/readyio/admin-panel/dist`. Edit `root` there if you used another folder. Nginx must be able to read it: `sudo chmod o+x /var/www /var/www/readyio`.
+
+**Cloudflare:** the readyio.com DNS is proxied through Cloudflare (orange cloud). Every site config includes `snippets/cloudflare-realip.conf`, which restores the visitor's IP from `CF-Connecting-IP`; without it all visitors share Cloudflare's IPs and hit the API rate limits together. In the Cloudflare dashboard set **SSL/TLS → Full (strict)** (Flexible causes redirect loops with the HTTPS redirect) and keep **Rocket Loader off** (it breaks Next.js hydration).
 
 ### 7.4 HTTPS certificates
 
