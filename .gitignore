@@ -1,0 +1,12 @@
+# This folder is the "readyio-deploy" repo (deploy/ + docs).
+# Each app is its own repo, cloned into the folders below.
+Backend/
+admin-panel/
+readyiosite/
+readyiosite-blog/
+Frontend/
+
+node_modules/
+.env
+.env.local
+*.log
