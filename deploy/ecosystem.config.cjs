@@ -1,6 +1,7 @@
-// PM2 process file for the Readyio VPS.
+// PM2 process file for the Zuvigo VPS.
 //   pm2 startOrReload deploy/ecosystem.config.cjs --update-env
-// The admin panel (blogpanel.readyio.com) is static and served by Nginx, so it has no process here.
+// The admin panel (blogpanel.zuvigo.com) is static and served by Nginx, so it has no process here.
+// Process names (readyio-api, readyio-site, readyio-blog) are preserved for process stability.
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');

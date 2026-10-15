@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and (re)start every Readyio app on the VPS.
+# Build and (re)start every Zuvigo app on the VPS.
 #
 #   bash deploy/scripts/deploy.sh                 # pull, build, reload everything
 #   RUN_MIGRATIONS=1 bash deploy/scripts/deploy.sh  # also run Backend migrations first
@@ -63,13 +63,13 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-step "readyio.com: install + build"
+step "zuvigo.com: install + build"
 (cd readyiosite && npm ci && npm run build)
 
-step "blog.readyio.com: install + build"
+step "blog.zuvigo.com: install + build"
 (cd readyiosite-blog && npm ci && npm run build)
 
-step "blogpanel.readyio.com: install + build"
+step "blogpanel.zuvigo.com: install + build"
 (cd admin-panel && npm ci && npm run build)
 
 step "Start/reload Next.js apps"
