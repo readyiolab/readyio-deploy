@@ -6,7 +6,7 @@ Everything runs on **one Ubuntu VPS** behind Nginx, with PM2 keeping the Node pr
 | --- | --- | --- | --- |
 | `zuvigo.com` (+ `www` → redirect) | Marketing site + blog listing (`readyiosite`, Next.js) | PM2 `readyio-site` | 8080 |
 | `blog.zuvigo.com` | Blog articles, categories, RSS, sitemap (`readyiosite-blog`, Next.js) | PM2 `readyio-blog` | 8081 |
-| `api.zuvigo.com` | CMS API + contact / booking / chatbot / newsletter (`Backend`, Express) | PM2 `readyio-api` | 4000 |
+| `cms-api.zuvigo.com` | CMS API + contact / booking / chatbot / newsletter (`Backend`, Express) | PM2 `readyio-api` | 4000 |
 | `blogpanel.zuvigo.com` | Blog admin panel (`admin-panel`, static Vite build) | Nginx only | — |
 | `readyio.com` (+ subdomains) | Legacy domains → 301 Permanent Redirect to `zuvigo.com` | Nginx 301 redirects | — |
 
@@ -25,7 +25,7 @@ Everything runs on **one Ubuntu VPS** behind Nginx, with PM2 keeping the Node pr
      zuvigo.com ───────────┘  │  │  └────────── blogpanel.zuvigo.com
      → 127.0.0.1:8080         │  │              → /var/www/readyio/admin-panel/dist
                               │  │
-     blog.zuvigo.com ─────────┘  └───────────── api.zuvigo.com
+     blog.zuvigo.com ─────────┘  └───────────── cms-api.zuvigo.com
      → 127.0.0.1:8081                           → 127.0.0.1:4000
                                                      │
  readyio-site / readyio-blog ── server-side ─────────┤  http://127.0.0.1:4000/api
@@ -39,7 +39,7 @@ Everything runs on **one Ubuntu VPS** behind Nginx, with PM2 keeping the Node pr
 
 How the pieces talk to each other:
 
-- **Browsers** call `https://api.zuvigo.com` for the contact form, booking, chatbot, newsletter, the blog view counter and the admin panel.
+- **Browsers** call `https://cms-api.zuvigo.com` for the contact form, booking, chatbot, newsletter, the blog view counter and the admin panel.
 - **The Next.js servers** fetch articles from `http://127.0.0.1:4000/api` (no public round trip). Pages are cached for 5 minutes.
 - **On publish/edit/delete** the API calls both sites' `/api/revalidate` on localhost with `REVALIDATE_SECRET`, so changes appear within seconds instead of waiting for the 5-minute cache.
 - Blog links on `zuvigo.com/blog` go to `https://blog.zuvigo.com/<slug>`. Old `zuvigo.com/blog/<slug>` URLs permanently redirect (308) there.
@@ -181,9 +181,9 @@ Production URLs are **already committed** and need no editing:
 
 | App | File | Key values |
 | --- | --- | --- |
-| readyiosite | `.env.production` | `NEXT_PUBLIC_API_URL=https://api.zuvigo.com`, `NEXT_PUBLIC_BLOG_URL=https://blog.zuvigo.com`, `CMS_API_URL=http://127.0.0.1:4000/api` |
-| readyiosite-blog | `.env.production` | `NEXT_PUBLIC_API_URL=https://api.zuvigo.com`, `NEXT_PUBLIC_CMS_API_URL=https://api.zuvigo.com/api`, `CMS_API_URL=http://127.0.0.1:4000/api` |
-| admin-panel | `.env.production` | `VITE_API_BASE_URL=https://api.zuvigo.com/api`, `VITE_BLOG_SITE_URL=https://blog.zuvigo.com` |
+| readyiosite | `.env.production` | `NEXT_PUBLIC_API_URL=https://cms-api.zuvigo.com`, `NEXT_PUBLIC_BLOG_URL=https://blog.zuvigo.com`, `CMS_API_URL=http://127.0.0.1:4000/api` |
+| readyiosite-blog | `.env.production` | `NEXT_PUBLIC_API_URL=https://cms-api.zuvigo.com`, `NEXT_PUBLIC_CMS_API_URL=https://cms-api.zuvigo.com/api`, `CMS_API_URL=http://127.0.0.1:4000/api` |
+| admin-panel | `.env.production` | `VITE_API_BASE_URL=https://cms-api.zuvigo.com/api`, `VITE_BLOG_SITE_URL=https://blog.zuvigo.com` |
 
 > `NEXT_PUBLIC_*` and `VITE_*` values are baked in at **build time**. After changing them, rebuild (rerun `deploy.sh`).
 
@@ -298,7 +298,7 @@ cd /var/www/readyio
 sudo cp deploy/nginx/snippets/cloudflare-realip.conf /etc/nginx/snippets/
 
 # 1) Install new primary Zuvigo virtual hosts
-for site in zuvigo.com blog.zuvigo.com api.zuvigo.com blogpanel.zuvigo.com; do
+for site in zuvigo.com blog.zuvigo.com cms-api.zuvigo.com blogpanel.zuvigo.com; do
   sudo cp deploy/nginx/$site.conf /etc/nginx/sites-available/$site.conf
   sudo ln -sf /etc/nginx/sites-available/$site.conf /etc/nginx/sites-enabled/$site.conf
 done
@@ -323,7 +323,7 @@ sudo nginx -t && sudo systemctl reload nginx
 # Request SSL for Zuvigo primary domains:
 sudo certbot --nginx --redirect -m you@zuvigo.com --agree-tos \
   -d zuvigo.com -d www.zuvigo.com \
-  -d blog.zuvigo.com -d api.zuvigo.com -d blogpanel.zuvigo.com
+  -d blog.zuvigo.com -d cms-api.zuvigo.com -d blogpanel.zuvigo.com
 
 # Maintain SSL for legacy Readyio domains so HTTPS 301 redirects work without certificate warnings:
 sudo certbot --nginx --redirect -m you@zuvigo.com --agree-tos \
@@ -339,7 +339,7 @@ Certbot edits the site files to add the 443 listeners and an HTTP→HTTPS redire
 
 ## 8. Go-live checklist
 
-Run from your PC after DNS and HTTPS are in place. Replace `<slug>` with a real article slug (for example one from `https://api.zuvigo.com/api/articles`).
+Run from your PC after DNS and HTTPS are in place. Replace `<slug>` with a real article slug (for example one from `https://cms-api.zuvigo.com/api/articles`).
 
 ```bash
 # Main site
@@ -352,7 +352,7 @@ curl -s  https://zuvigo.com/sitemap.xml | head -5
 # 301 Domain Migration Redirects from ReadyIO
 curl -sI https://readyio.com | grep -i location             # https://zuvigo.com/
 curl -sI https://blog.readyio.com/my-post | grep -i location # https://blog.zuvigo.com/my-post
-curl -sI https://api.readyio.com/health | grep -i location  # https://api.zuvigo.com/health
+curl -sI https://api.readyio.com/health | grep -i location  # https://cms-api.zuvigo.com/health
 curl -sI https://blogpanel.readyio.com | grep -i location   # https://blogpanel.zuvigo.com/
 
 # Blog
@@ -363,9 +363,9 @@ curl -s  https://blog.zuvigo.com/sitemap.xml | head -5
 curl -sI https://blog.zuvigo.com/feed.xml | head -1         # 200
 
 # API
-curl -s  https://api.zuvigo.com/health                      # {"status":"Server is running"}
-curl -s  "https://api.zuvigo.com/api/articles" | head -c 300
-curl -si -X OPTIONS https://api.zuvigo.com/api/contact \
+curl -s  https://cms-api.zuvigo.com/health                  # {"status":"Server is running"}
+curl -s  "https://cms-api.zuvigo.com/api/articles" | head -c 300
+curl -si -X OPTIONS https://cms-api.zuvigo.com/api/contact \
   -H "Origin: https://zuvigo.com" -H "Access-Control-Request-Method: POST" \
   | grep -i access-control-allow-origin                      # https://zuvigo.com
 

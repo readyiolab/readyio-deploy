@@ -5,7 +5,7 @@
 | [`readyiosite/`](readyiosite/README.md) | https://zuvigo.com | Marketing site + blog listing (Next.js 16) |
 | [`readyiosite-blog/`](readyiosite-blog/README.md) | https://blog.zuvigo.com | Blog articles (Next.js 16) |
 | [`admin-panel/`](admin-panel/README.md) | https://blogpanel.zuvigo.com | Blog admin panel (React + Vite, static) |
-| [`Backend/`](Backend/README.md) | https://api.zuvigo.com | CMS API + contact/booking/chatbot/newsletter (Express + MySQL) |
+| [`Backend/`](Backend/README.md) | https://cms-api.zuvigo.com | CMS API + contact/booking/chatbot/newsletter (Express + MySQL) |
 | [`deploy/`](deploy/DEPLOYMENT.md) | — | PM2, Nginx and deploy script for the VPS (with 301 redirects from readyio.com) |
 | `Frontend/` | not deployed | Old TanStack site, kept as the source of the original blog images |
 
